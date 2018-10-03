@@ -1,11 +1,14 @@
 const expect = require('expect');
 const request = require('supertest');
+const {ObjectId} = require('mongodb');
 
 var {app} = require('./../server');
 var {Todo} = require('./../models/todo');
 
 var todos = [
-{text:"todo1"},{text:"todo2"}, {text:"todo3"}];
+{
+	_id:new ObjectId(),
+	text:"todo1"},{_id:new ObjectId(),text:"todo2"}, {_id:new ObjectId(),text:"todo3"}];
 beforeEach((done)=>{
 	Todo.remove({}).then(()=>{return Todo.insertMany(todos)}).then(()=>done());
 });
@@ -58,6 +61,33 @@ describe('GET todos', ()=>{
 		.expect((res)=>{
 			expect(res.body.todos.length).toBe(3)
 		})
+		.end(done);
+	});
+});
+describe('GET todos:id', ()=>{
+	it('should get one todo', (done)=>{
+		request(app)
+		.get(`/todos/${todos[0]._id.toHexString()}`)
+		.expect(200)
+		.expect((res)=>{
+			expect(res.body.todos.text).toBe(todos[0].text)
+		})
+		.end(done);
+	});
+
+	it('should get 404 on valid ID', (done)=>{
+		tmpid = new ObjectId();
+		request(app)
+		.get(`/todos/${tmpid.toHexString()}`)
+		.expect(404)
+		.end(done);
+	});
+
+	it('should get 404 on dummy id', (done)=>{
+		tmp = 123456;
+		request(app)
+		.get(`/todos/${tmp}`)
+		.expect(404)
 		.end(done);
 	});
 });
