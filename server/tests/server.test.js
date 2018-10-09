@@ -91,3 +91,39 @@ describe('GET todos:id', ()=>{
 		.end(done);
 	});
 });
+
+describe('DELETE todo/id', ()=>{
+	var idd = todos[1]._id.toHexString();
+	it('should delete 1 todo', (done)=>{
+		request(app)
+		.delete(`/todos/${idd}`)
+		.expect(200)
+		.expect((res)=>{
+			expect(res.body.todos._id).toBe(idd);
+		})
+		.end((err, res)=>{
+			if(err)
+				return done(err);
+			Todo.findById(idd).then((todo)=>{
+				expect(todo).toBeFalsy();
+				done();
+			}).catch((e)=>done(e));
+		});
+	});
+	it('should return 404 if not found', (done)=>{
+		tmpid = new ObjectId();
+		request(app)
+		.delete(`/todos/${tmpid.toHexString()}`)
+		.expect(404)
+		.end(done);
+
+	});
+	it('should return 404 if not valid', (done)=>{
+		tmpid = 1234656;
+		request(app)
+		.delete(`/todos/${tmpid}`)
+		.expect(404)
+		.end(done);
+	});
+
+});
