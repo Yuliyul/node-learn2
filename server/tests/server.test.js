@@ -8,7 +8,9 @@ var {Todo} = require('./../models/todo');
 var todos = [
 {
 	_id:new ObjectId(),
-	text:"todo1"},{_id:new ObjectId(),text:"todo2"}, {_id:new ObjectId(),text:"todo3"}];
+	text:"todo1"},
+{_id:new ObjectId(),text:"todo2", "completed":true, "completedAt":"111"},
+{_id:new ObjectId(),text:"todo3"}];
 beforeEach((done)=>{
 	Todo.remove({}).then(()=>{return Todo.insertMany(todos)}).then(()=>done());
 });
@@ -127,3 +129,34 @@ describe('DELETE todo/id', ()=>{
 	});
 
 });
+describe('PATCH tests', ()=>{
+	var tmpid = todos[0]._id.toHexString();
+	var upd = {"text":"updated", "completed":"true"};
+	var text = "Updates";
+	it('should update todo', (done)=>{
+		request(app)
+		.patch(`/todos/${tmpid}`)
+		.send({completed:true, text})
+		.expect(200)
+		.expect((todo)=>{
+			expect(todo.body.todo.text).toBe(text);
+			expect(todo.body.todo.completed).toBe(true);
+			expect(typeof todo.body.todo.completedAt).toBe("number");
+		})
+		.end(done);
+	});
+	var tmpid = todos[1]._id.toHexString();
+	var upd = {completed:false};
+	it('should unset todo completed', (done)=>{
+		request(app)
+		.patch(`/todos/${tmpid}`)
+		.send(upd)
+		.expect(200)
+		.expect((todo)=>{
+			expect(todo.body.todo.completed).toBe(false);
+			expect(todo.body.todo.completedAt).toBeFalsy();
+		})
+		.end(done);
+	});
+
+}); 

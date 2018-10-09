@@ -77,17 +77,6 @@ app.patch('/todos/:id', (req, res) => {
 	});
 
 });
-
-Todo.findById('5bbc8c94d2ff582a089a860e').then((todo)=>{
-	console.log(todo);
-		if(!todo)
-			console.log('not found');
-		else
-			console.log(' found');
-	}).catch((e)=>{
-		console.log(e);
-	});
-
 app.listen(port, ()=>{console.log(`Started on port ${port}`)});
 
 module.exports = {app};
