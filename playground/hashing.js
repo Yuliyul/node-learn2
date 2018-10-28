@@ -3,11 +3,11 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 var password = 'password1';
-// bcrypt.genSalt(10, (err, salt)=>{
-// 	bcrypt.hash(password, salt, (err, hash)=>{
-// 		console.log(hash);
-// 	});
-// });
+bcrypt.genSalt(10, (err, salt)=>{
+	bcrypt.hash(password, salt, (err, hash)=>{
+		console.log(hash);
+	});
+});
 var result = "$2a$10$FGsJj/whNAvdFTO/KAL09.koynVjZBDgOBGmK6Fze3cMlAnIup9Cm";
 bcrypt.compare(password, result, (err, res)=>{
 	console.log(res);

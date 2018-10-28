@@ -12,7 +12,9 @@ var todos = [
 {_id:new ObjectId(),text:"todo2", "completed":true, "completedAt":"111"},
 {_id:new ObjectId(),text:"todo3"}];
 beforeEach((done)=>{
-	Todo.remove({}).then(()=>{return Todo.insertMany(todos)}).then(()=>done());
+	Todo.remove({})
+	.then(()=>{return Todo.insertMany(todos);})
+	.then(()=>done());
 });
 describe('POST /todos', ()=>{
 	it('should create new todo', (done)=>{
@@ -159,4 +161,4 @@ describe('PATCH tests', ()=>{
 		.end(done);
 	});
 
-}); 
+});
