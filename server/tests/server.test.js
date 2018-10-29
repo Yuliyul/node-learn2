@@ -4,18 +4,11 @@ const {ObjectId} = require('mongodb');
 
 var {app} = require('./../server');
 var {Todo} = require('./../models/todo');
+var {User} = require('./../models/user');
+var {todos, populateTodo, users, populateUser} = require('./seed/seed');
 
-var todos = [
-{
-	_id:new ObjectId(),
-	text:"todo1"},
-{_id:new ObjectId(),text:"todo2", "completed":true, "completedAt":"111"},
-{_id:new ObjectId(),text:"todo3"}];
-beforeEach((done)=>{
-	Todo.remove({})
-	.then(()=>{return Todo.insertMany(todos);})
-	.then(()=>done());
-});
+beforeEach(populateUser);
+beforeEach(populateTodo);
 describe('POST /todos', ()=>{
 	it('should create new todo', (done)=>{
 		var text = 'Test text';
@@ -160,5 +153,73 @@ describe('PATCH tests', ()=>{
 		})
 		.end(done);
 	});
+});
+describe('GET /users/me', () => {
+	it('should return user if authenticated', (done) => {
+		request(app)
+		.get('/users/me')
+		.set('x-auth', users[0].tokens[0].token)
+		.expect(200)
+		.expect((res)=>{
+			expect(res.body._id).toBe(users[0]._id.toHexString());
+			expect(res.body.email).toBe(users[0].email);
+		})
+		.end(done);
 
+	});
+	it('should return 401 if not authenticated', (done) => {
+		request(app)
+		.get('/users/me')
+		//.set('x-auth', '')
+		.expect(401)
+		.expect((res)=>{
+			expect(res.body).toEqual({});
+		})
+		.end(done);
+	});
+});
+describe('POST /users', () => {
+	it('should create a user', (done) => {
+		var email = 'jijiji@kgf.gg';
+		var password = 'fdsdfdf789';
+		request(app)
+		.post('/users')
+		.send({email,password})
+		.expect(200)
+		.expect((res)=>{
+			expect(res.headers['x-auth']).toBeTruthy();
+			expect(res.body._id).toBeTruthy();
+			expect(res.body.email).toBe(email);
+		})
+		.end((err)=>{
+			if(err)
+				return done(err);
+			User.findOne({email}).then((user)=>{
+				expect(user).toBeTruthy();
+				expect(user.password).not.toBe(password);
+				done();
+			});
+		});
+	});
+	it('should return validation errors if request invalid', (done) => {
+		var email = 'moka2';
+		var password = 'fd';
+		request(app)
+		.post('/users')
+		.send({email,password})
+		.expect(400)
+
+		.end(done);
+
+	});
+	it('should not create user if email in use', (done) => {
+		var email = 'moka2@test.com';
+		var password = 'fdsdfdf789';
+		request(app)
+		.post('/users')
+		.send({email,password})
+		.expect(400)
+		.end(done);
+
+	});
 });
