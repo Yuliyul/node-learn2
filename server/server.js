@@ -3,10 +3,13 @@ const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectId} = require('mongodb');
+const bcrypt = require('bcryptjs');
+
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
 var {authenticate} = require('./middleware/authenticate');
+
 
 const port = process.env.PORT || 3000;
 var app = express();
@@ -93,6 +96,28 @@ app.post('/users', (req,res)=>{
 	}).catch((e)=>{
 		res.status(400).send(e);
 	});
+});
+//USERS login
+app.post('/users/login', (req,res)=>{
+	var body = _.pick(req.body, ['email','password']);
+	User.findByCredentials(body.email, body.password).then(
+		(user)=>{
+			return user.generateAuthToken().then((token)=>{
+				res.header('x-auth', token).send(user);
+		})
+	}).catch((e)=>{res.status(400).send(e);});
+	// User.findOne({email:email}).then((user)=>{
+	// 	console.log(user);
+	// 	bcrypt.compare(password, user.password, (err, data)=>{
+	// 		if(data === true)
+	// 			res.send(user);
+	// 		else {
+	// 			res.status(400).send();
+	// 		}
+	// 	});
+	// }, (e)=>{
+	// 	res.status(400).send(e);
+	// });
 });
 // var authenticate = (req, res, next)=>{
 // 	var token = req.header('x-auth');
