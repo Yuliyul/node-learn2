@@ -265,9 +265,22 @@ describe('POST /users/login', ()=>{
 				expect(user.tokens.length).toBe(0);
 				done();
 			}).catch((e)=>{done(e);})
-
 		});
-
 	});
-
+});
+describe('DELETE /users/me/token', ()=>{
+	it('should delete token', (done)=>{
+		request(app)
+		.delete('/users/me/token')
+		.set('x-auth', users[0].tokens[0].token)
+		.expect(200)
+		.end((err, res)=>{
+			if(err)
+				return done(err);
+			User.findOne({email : users[0].email}).then((user)=>{
+				expect(user.tokens.length).toBe(0);
+				done();
+			}).catch((e)=>{done(e)});
+		});
+	});
 });
