@@ -14,10 +14,11 @@ var {authenticate} = require('./middleware/authenticate');
 const port = process.env.PORT || 3000;
 var app = express();
 app.use(bodyParser.json());
-app.post('/todos', (req,res)=>{
+app.post('/todos', authenticate, (req,res)=>{
 	var ntodo = new Todo({
 		text : req.body.text,
-		completed:req.body.completed
+		completed:req.body.completed,
+		_creator : req.user._id
 	});
 	ntodo.save().then((doc)=>{
 		res.send(doc);
@@ -26,8 +27,8 @@ app.post('/todos', (req,res)=>{
 		res.status(400).send(e);
 	});
 });
-app.get('/todos', (req, res) => {
-	Todo.find().then((todos)=>{
+app.get('/todos', authenticate, (req, res) => {
+	Todo.find({_creator:req.user._id}).then((todos)=>{
 		res.send({todos});
 	},
 	(e)=>{

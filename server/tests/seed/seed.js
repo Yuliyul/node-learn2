@@ -2,21 +2,20 @@ const {ObjectId} = require('mongodb');
 const jwt = require('jsonwebtoken');
 var {Todo} = require('./../../models/todo');
 var {User} = require('./../../models/user');
-
+var Id1 = new ObjectId();
+var Id2 = new ObjectId();
 var todos = [
-{
-	_id:new ObjectId(),
-	text:"todo1"},
-{_id:new ObjectId(),text:"todo2", "completed":true, "completedAt":"111"},
-{_id:new ObjectId(),text:"todo3"}];
+{	_id:new ObjectId(),	text:"todo1", _creator:Id1},
+{_id:new ObjectId(),text:"todo2", "completed":true, "completedAt":"111",_creator:Id2},
+
+];
 
 const populateTodo = (done)=>{
 	Todo.remove({})
 	.then(()=>{return Todo.insertMany(todos);})
 	.then(()=>done());
 };
-var Id1 = new ObjectId();
-var Id2 = new ObjectId();
+
 var users = [
 {
 	_id : Id1,
