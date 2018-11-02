@@ -31,7 +31,13 @@ var users = [
 {
 	_id : Id2,
 	email:"moka2@test.com",
-  password : "passworD2"
+  password : "passworD2",
+	tokens : [
+    {
+      access : 'auth',
+      token : jwt.sign({_id : Id2.toHexString(), access:"auth"}, 'secret').toString()
+    }
+  ]
 }];
 const populateUser = (done)=>{
 	User.remove({})
