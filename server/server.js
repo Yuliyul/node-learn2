@@ -106,63 +106,20 @@ app.post('/users/login', (req,res)=>{
 				res.header('x-auth', token).send(user);
 		})
 	}).catch((e)=>{res.status(400).send(e);});
-	// User.findOne({email:email}).then((user)=>{
-	// 	console.log(user);
-	// 	bcrypt.compare(password, user.password, (err, data)=>{
-	// 		if(data === true)
-	// 			res.send(user);
-	// 		else {
-	// 			res.status(400).send();
-	// 		}
-	// 	});
-	// }, (e)=>{
-	// 	res.status(400).send(e);
-	// });
 });
-// var authenticate = (req, res, next)=>{
-// 	var token = req.header('x-auth');
-// 	User.findByToken(token).then((user)=>{
-// 		if(!user){
-// 			return Promise.reject('User not found');
-// 		}
-// 		req.user = user;
-// 		req.token = token;
-// 		res.send(user);
-// 	}).catch((e)=>{
-// 		res.status(401).send();
-// 	});
-// };
+
 app.get('/users/me', authenticate, (req,res)=>{
-	// var token = req.header('x-auth');
-	// User.findByToken(token).then((user)=>{
-	// 	if(!user){
-	// 		return Promise.reject('User not found');
-	// 	}
-	// 	res.send(user);
-	// }).catch((e)=>{
-	// 	res.status(401).send();
-	// });
 	res.send(req.user);
+});
+
+app.delete('/users/me/token', authenticate, (req, res)=>{
+	req.user.removeToken(req.token).then(()=>{
+		res.status(200).send();
+	}, ()=>{
+		res.status(400).send();
+	}).catch((e)=>{console.log(e)});
+
 });
 app.listen(port, ()=>{console.log(`Started on port ${port}`)});
 
 module.exports = {app};
-
-
-
-// var newTodo = new Todo({
-// 	text:'Cook maffins'
-// });
-
-
-// var newTodo = new Todo({
-// 	text:'Learn node',
-// 	completed:false,
-// 	completedAt:null
-// });
-// newTodo.save().then((doc)=>{
-// 	console.log('Saved ', doc);
-// },
-// 	(e)=>{
-// 		console.log('cannot save');
-// 	});
