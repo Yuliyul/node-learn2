@@ -24,7 +24,7 @@ var users = [
   tokens : [
     {
       access : 'auth',
-      token : jwt.sign({_id : Id1.toHexString(), access:"auth"}, 'secret').toString()
+      token : jwt.sign({_id : Id1.toHexString(), access:"auth"}, process.env.JWT_SECRET).toString()
     }
   ]
 },
@@ -35,7 +35,7 @@ var users = [
 	tokens : [
     {
       access : 'auth',
-      token : jwt.sign({_id : Id2.toHexString(), access:"auth"}, 'secret').toString()
+      token : jwt.sign({_id : Id2.toHexString(), access:"auth"}, process.env.JWT_SECRET).toString()
     }
   ]
 }];
